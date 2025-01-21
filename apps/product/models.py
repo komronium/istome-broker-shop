@@ -31,9 +31,10 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True,
                                  verbose_name='Категория',
                                  related_name='products')
+    sku = models.PositiveIntegerField(verbose_name='Артикул')
     price = models.PositiveIntegerField(verbose_name='Цена')
     old_price = models.PositiveIntegerField(null=True, blank=True, verbose_name='Старая цена')
-    stock = models.PositiveIntegerField(default=0, verbose_name='Количество на складе')
+    quantity = models.PositiveIntegerField(default=0, verbose_name='Количество на складе')
 
     class Meta:
         db_table = 'products'
@@ -53,3 +54,5 @@ class ProductImage(models.Model):
     class Meta:
         db_table = 'product_images'
         ordering = ['created_at']
+        verbose_name = 'Изображение продукта'
+        verbose_name_plural = 'Изображения продукта'
