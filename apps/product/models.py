@@ -1,4 +1,5 @@
 from django.db import models
+from apps.accounts.models import User
 
 
 class Category(models.Model):
@@ -56,3 +57,12 @@ class ProductImage(models.Model):
         ordering = ['created_at']
         verbose_name = 'Изображение продукта'
         verbose_name_plural = 'Изображения продукта'
+
+
+class FeaturedProduct(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='featured_product')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='featured_products')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'featured_products'
