@@ -2,12 +2,13 @@ from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer, FeatureProductSerializer
 from .filters import ProductFilter
+from ..accounts.permissions import IsPartner
 
 
 class CategoryListView(ListAPIView):
@@ -30,6 +31,11 @@ class ProductListView(ListCreateAPIView):
 
     def get_serializer_context(self):
         return {'request': self.request}
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return []
+        return [IsPartner()]
 
 
 class FeaturedProductListView(ListAPIView):
