@@ -10,13 +10,15 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True, verbose_name='Номер телефона')
     inn = models.CharField(max_length=15, null=True, blank=True, verbose_name='ИНН организации')
     is_partner = models.BooleanField(default=False, verbose_name='Партнер?')
-    date_joined = models.DateTimeField(auto_now_add=True, verbose_name='Дата регистрации')
+    date_joined = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='Дата регистрации')
 
     username = None
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
     objects = UserManager()
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ['-date_joined']

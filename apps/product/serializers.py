@@ -1,4 +1,6 @@
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
+
 from rest_framework import serializers
 
 from .models import Category, Product, ProductImage, FeaturedProduct
@@ -9,6 +11,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ['id', 'image']
+        read_only_fields = ['id']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -21,7 +24,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_children(obj):
-        return CategorySerializer(obj.children.all(), many=True).data
+        cache_key = f'category_children_{obj.id}'
+        children = cache.get(cache_key)
+
+        if not children:
+            children = CategorySerializer(obj.children.all(), many=True).data
+            cache.set(cache_key, children, timeout=3600)
+
+        return children
 
 
 class ProductSerializer(serializers.ModelSerializer):

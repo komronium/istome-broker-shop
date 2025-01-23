@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.cache import cache
+
 from apps.accounts.models import User
 
 
@@ -21,10 +23,26 @@ class Category(models.Model):
 
     @property
     def product_count(self):
-        count = self.products.count()
-        for child in self.children.all():
-            count += child.product_count
+        cache_key = f'category_product_count_{self.id}'
+        count = cache.get(cache_key)
+
+        if count is None:
+            count = self.products.count()
+            for child in self.children.all():
+                count += child.product_count
+            cache.set(cache_key, count, timeout=3600)
+
         return count
+
+    def get_full_path(self):
+        path = [self.name]
+        current = self.parent
+
+        while current:
+            path.append(current.name)
+            current = current.parent
+
+        return ' > '.join(reversed(path))
 
 
 class Product(models.Model):
@@ -47,6 +65,11 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if self.category:
+            cache.delete(f'category_product_count_{self.category.id}')
+        super().save(*args, **kwargs)
 
 
 class ProductImage(models.Model):
