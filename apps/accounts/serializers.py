@@ -80,6 +80,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_partner = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = User
