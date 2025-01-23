@@ -7,12 +7,12 @@ from apps.accounts.models import User
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ('email', 'full_name', 'phone_number')
+    list_display = ('email', 'full_name', 'is_partner', 'phone_number')
     readonly_fields = ('date_joined',)
     ordering = ('-date_joined',)
     fieldsets = (
         (None, {'fields': (
-            'email', 'full_name', 'phone_number',
+            'email', 'full_name', 'phone_number', 'is_partner', 'inn'
         )}),
         ('Extra information', {'fields': ('password', 'date_joined')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),

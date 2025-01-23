@@ -32,6 +32,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True,
                                  verbose_name='Категория',
                                  related_name='products')
+    description = models.TextField(verbose_name='Описание')
+    attrs = models.TextField(null=True, blank=True, verbose_name='Характеристики')
     sku = models.PositiveIntegerField(verbose_name='Артикул')
     price = models.PositiveIntegerField(verbose_name='Цена')
     old_price = models.PositiveIntegerField(null=True, blank=True, verbose_name='Старая цена')

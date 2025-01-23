@@ -26,22 +26,33 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.SerializerMethodField()
+    category_id = serializers.IntegerField(write_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     is_featured = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'category', 'category', 'price', 'old_price', 'quantity', 'is_featured', 'images']
+        fields = [
+            'id', 'name', 'category', 'category_id', 'description', 'attrs', 'sku', 'category',
+            'price', 'old_price', 'quantity', 'is_featured', 'images'
+        ]
+
 
     def get_category(self, obj):
         return {
             'id': obj.category.id,
             'name': obj.category.name
-        }
+        } if obj.category else None
 
     def get_is_featured(self, obj):
         user = self.context.get('request').user
         return user.is_authenticated and FeaturedProduct.objects.filter(user=user, product=obj).exists()
+
+    def create(self, validated_data):
+        category = get_object_or_404(Category, id=validated_data.pop('category_id'))
+        product = Product.objects.create(**validated_data, category=category)
+        return product
+
 
 
 class FeatureProductSerializer(serializers.Serializer):

@@ -8,6 +8,8 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, db_index=True, verbose_name='Электронная почта')
     full_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='Полное имя')
     phone_number = models.CharField(max_length=15, blank=True, null=True, verbose_name='Номер телефона')
+    inn = models.CharField(max_length=15, null=True, blank=True, verbose_name='ИНН организации')
+    is_partner = models.BooleanField(default=False, verbose_name='Партнер?')
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name='Дата регистрации')
 
     username = None

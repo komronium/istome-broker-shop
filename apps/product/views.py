@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -18,7 +18,7 @@ class CategoryListView(ListAPIView):
         return Category.objects.filter(parent=None)
 
 
-class ProductListView(ListAPIView):
+class ProductListView(ListCreateAPIView):
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
