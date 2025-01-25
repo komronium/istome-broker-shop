@@ -7,7 +7,7 @@ from .models import Category, Product, ProductImage, FeaturedProduct
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
-    product_id = serializers.IntegerField(write_only=True)
+    product_id = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = ProductImage
