@@ -7,11 +7,23 @@ from .models import Category, Product, ProductImage, FeaturedProduct
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = ProductImage
-        fields = ['id', 'image']
+        fields = ['id', 'image', 'product_id']
         read_only_fields = ['id']
+
+    def create(self, validated_data):
+        product_id = validated_data.pop('product_id', None)
+        image = ProductImage(**validated_data)
+
+        if product_id:
+            product = get_object_or_404(Product, id=product_id)
+            image.product = product
+
+        image.save()
+        return image
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -39,12 +51,14 @@ class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(write_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     is_featured = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
+    image_ids = serializers.ListField(write_only=True, required=False)
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'category', 'category_id', 'description', 'attrs', 'sku', 'category',
-            'price', 'old_price', 'quantity', 'is_featured', 'images'
+            'price', 'old_price', 'quantity', 'is_featured', 'like_count', 'image_ids', 'images'
         ]
 
 
@@ -58,9 +72,22 @@ class ProductSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         return user.is_authenticated and FeaturedProduct.objects.filter(user=user, product=obj).exists()
 
+    @staticmethod
+    def get_like_count(obj) -> int:
+        return FeaturedProduct.objects.filter(product=obj).count()
+
     def create(self, validated_data):
+        image_ids = validated_data.pop('image_ids', [])
         category = get_object_or_404(Category, id=validated_data.pop('category_id'))
         product = Product.objects.create(**validated_data, category=category)
+
+        for image_id in image_ids:
+            image = ProductImage.objects.filter(id=image_id).first()
+
+            if image:
+                image.product = product
+                image.save()
+
         return product
 
 

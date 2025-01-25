@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.cache import cache
+from django.db.models import Manager
 
 from apps.accounts.models import User
 
@@ -11,6 +12,8 @@ class Category(models.Model):
                                verbose_name='Родительская категория')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
+
+    objects = Manager()
 
     class Meta:
         db_table = 'categories'
@@ -73,9 +76,11 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
     image = models.ImageField(upload_to='products/')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = Manager()
 
     class Meta:
         db_table = 'product_images'

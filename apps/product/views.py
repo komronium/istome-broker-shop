@@ -1,12 +1,13 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveDestroyAPIView
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 
-from .models import Category, Product
-from .serializers import CategorySerializer, ProductSerializer, FeatureProductSerializer
+from .models import Category, Product, ProductImage
+from .serializers import CategorySerializer, ProductSerializer, FeatureProductSerializer, ProductImageSerializer
 from .filters import ProductFilter
 from ..accounts.permissions import IsPartner
 
@@ -55,3 +56,17 @@ class FeatureProductView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.save(user=request.user, **kwargs)
         return Response(data, status=status.HTTP_200_OK)
+
+
+class ImageCreateView(CreateAPIView):
+    serializer_class = ProductImageSerializer
+    permission_classes = (IsAuthenticated,)
+
+
+class ImageDetailView(RetrieveDestroyAPIView):
+    serializer_class = ProductImageSerializer
+    permission_classes = (IsAuthenticated,)
+    lookup_url_kwarg = 'image_id'
+
+    def get_queryset(self):
+        return ProductImage.objects.all()

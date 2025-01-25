@@ -22,3 +22,8 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name']
     inlines = [ProductImageInline]
     ordering = ['name']
+
+
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
+    pass
