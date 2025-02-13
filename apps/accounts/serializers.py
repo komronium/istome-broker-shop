@@ -28,11 +28,11 @@ class LoginSerializer(serializers.Serializer):
             user = User.objects.filter(phone_number=login).first()
             user = authenticate(email=user.email if user else None, password=password)
 
-        if is_partner and not user.is_partner:
-            raise AuthenticationFailed(detail='User is not a partner')
-
         if not user:
             raise AuthenticationFailed(detail='Invalid login or password')
+
+        if is_partner and not user.is_partner:
+            raise AuthenticationFailed(detail='User is not a partner')
 
         if not user.is_active:
             raise AuthenticationFailed(detail='User account is disabled')
