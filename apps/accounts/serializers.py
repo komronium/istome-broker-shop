@@ -13,17 +13,23 @@ from apps.accounts.models import User
 class LoginSerializer(serializers.Serializer):
     login = serializers.CharField(write_only=True, help_text='Phone number or email')
     password = PasswordField(write_only=True)
+    is_partner = serializers.BooleanField(write_only=True, default=False, required=False)
     refresh = serializers.CharField(read_only=True, min_length=200, max_length=300)
     access = serializers.CharField(read_only=True, min_length=200, max_length=300)
 
     def validate(self, attrs):
         login = attrs.get('login')
         password = attrs.get('password')
+        is_partner = attrs.get('is_partner')
+
         if '@' in login:
             user = authenticate(email=login, password=password)
         else:
             user = User.objects.filter(phone_number=login).first()
             user = authenticate(email=user.email if user else None, password=password)
+
+        if is_partner and not user.is_partner:
+            raise AuthenticationFailed(detail='User is not a partner')
 
         if not user:
             raise AuthenticationFailed(detail='Invalid login or password')
