@@ -1,7 +1,14 @@
 from rest_framework import status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    CreateAPIView,
+    ListCreateAPIView,
+    RetrieveDestroyAPIView,
+    RetrieveAPIView
+)
+
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 
@@ -36,6 +43,14 @@ class ProductListView(ListCreateAPIView):
         if self.request.method in SAFE_METHODS:
             return []
         return [IsPartner()]
+
+
+class ProductDetailView(RetrieveAPIView):
+    serializer_class = ProductSerializer
+    lookup_url_kwarg = 'product_id'
+
+    def get_queryset(self):
+        return Product.objects.all()
 
 
 class FeaturedProductListView(ListAPIView):
